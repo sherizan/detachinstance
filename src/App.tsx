@@ -24,7 +24,7 @@ function App() {
         </nav>
       </header>
 
-      <main className="flex-grow p-8">
+      <main className="grow p-8">
         <section id="home" className="text-center mb-8">
           <h2 className="text-2xl font-bold mb-4">Welcome to Our Site</h2>
           <p className="text-gray-700">
