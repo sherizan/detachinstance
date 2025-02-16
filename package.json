@@ -10,9 +10,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.48.1",
+    "cheerio": "^1.0.0",
+    "cors": "^2.8.5",
+    "express-http-proxy": "^2.1.1",
     "gsap": "^3.12.7",
+    "node-fetch": "^2.7.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.1.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
