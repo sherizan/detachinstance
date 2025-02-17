@@ -42,16 +42,29 @@ export function AddProduct() {
     setError(null)
     
     try {
+      // Validate category_id
+      if (!newProduct.category_id) {
+        throw new Error('Please select a category')
+      }
+
+      // Validate URL format
+      if (!newProduct.url.match(/^[^/]+\.[^/]+$/)) {
+        throw new Error('URL should be in format: domain.com')
+      }
+
       const { error } = await supabase
         .from('products')
         .insert([
           {
-            ...newProduct,
+            name: newProduct.name,
+            url: newProduct.url,
+            description: newProduct.description,
+            logo_url: newProduct.logo_url,
+            video_url: newProduct.video_url,
+            category_id: newProduct.category_id,
             votes: 0
           }
         ])
-        .select()
-        .single()
 
       if (error) throw error
       
@@ -87,12 +100,15 @@ export function AddProduct() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Product Name
             </label>
             <input
+              id="name"
+              name="name"
               type="text"
               required
+              autoComplete="off"
               value={newProduct.name}
               onChange={(e) => setNewProduct({...newProduct, name: e.target.value})}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
@@ -101,12 +117,15 @@ export function AddProduct() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label htmlFor="url" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Product URL
             </label>
             <input
+              id="url"
+              name="url"
               type="text"
               required
+              autoComplete="url"
               placeholder="e.g. uizard.io"
               value={newProduct.url}
               onChange={(e) => setNewProduct({...newProduct, url: e.target.value})}
@@ -115,11 +134,14 @@ export function AddProduct() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Description
             </label>
             <textarea
+              id="description"
+              name="description"
               required
+              autoComplete="off"
               value={newProduct.description}
               onChange={(e) => setNewProduct({...newProduct, description: e.target.value})}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
@@ -129,12 +151,15 @@ export function AddProduct() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label htmlFor="logo_url" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Logo URL
             </label>
             <input
+              id="logo_url"
+              name="logo_url"
               type="url"
               required
+              autoComplete="url"
               value={newProduct.logo_url}
               onChange={(e) => setNewProduct({...newProduct, logo_url: e.target.value})}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
@@ -143,12 +168,15 @@ export function AddProduct() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label htmlFor="video_url" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Video URL
             </label>
             <input
+              id="video_url"
+              name="video_url"
               type="url"
               required
+              autoComplete="url"
               value={newProduct.video_url}
               onChange={(e) => setNewProduct({...newProduct, video_url: e.target.value})}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
@@ -157,11 +185,14 @@ export function AddProduct() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label htmlFor="category_id" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Category
             </label>
             <select
+              id="category_id"
+              name="category_id"
               required
+              autoComplete="off"
               value={newProduct.category_id || ''}
               onChange={(e) => setNewProduct({...newProduct, category_id: Number(e.target.value)})}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"

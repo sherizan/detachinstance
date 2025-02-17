@@ -13,7 +13,7 @@ export function HomePage() {
     error: null
   })
   const [page, setPage] = useState(1)
-  const PAGE_SIZE = 6
+  const PAGE_SIZE = 12
   const [sortBy, setSortBy] = useState<SortOption>('votes')
   const [categories, setCategories] = useState<Category[]>([])
   const [categoriesLoading, setCategoriesLoading] = useState(true)
@@ -28,6 +28,7 @@ export function HomePage() {
     try {
       if (!isLoadingMore) {
         setLoadingState((prev: LoadingState) => ({ ...prev, isLoading: true }))
+        setProducts([])
       }
 
       const from = (page - 1) * PAGE_SIZE
@@ -39,6 +40,7 @@ export function HomePage() {
           *,
           category:categories(*)
         `, { count: 'exact' })
+        .range(from, to)
 
       // Apply sorting
       if (sortBy === 'votes') {
@@ -52,11 +54,12 @@ export function HomePage() {
         query = query.eq('categories.slug', activeCategory)
       }
 
-      const { data, error, count } = await query.range(from, to)
+      const { data, error, count } = await query
 
       if (error) throw error
       
       if (data) {
+        // Only append if loading more, otherwise replace
         setProducts(prev => isLoadingMore ? [...prev, ...data] : data)
         setLoadingState((prev: LoadingState) => ({ 
           ...prev, 
@@ -74,10 +77,12 @@ export function HomePage() {
     }
   }, [page, sortBy, activeCategory])
 
+  // Reset page when category or sort changes
   useEffect(() => {
     setPage(1)
+    setProducts([]) // Clear products
     fetchProducts()
-  }, [sortBy, fetchProducts])
+  }, [sortBy, activeCategory, fetchProducts])
 
   useEffect(() => {
     const fetchCategories = async () => {
