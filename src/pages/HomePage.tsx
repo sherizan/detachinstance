@@ -1,11 +1,9 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect, useCallback } from 'react'
 import gsap from 'gsap'
-import type { Product, PaginationState, LoadingState, SortOption, Category } from '../types'
+import type { Product, LoadingState, SortOption, Category } from '../types'
 import { supabase } from '../lib/supabase'
 
 export function HomePage() {
-  const navigate = useNavigate()
   const [isGridView, setIsGridView] = useState(true)
   const [activeCategory, setActiveCategory] = useState<string>('all')
   const [products, setProducts] = useState<Product[]>([])
@@ -21,7 +19,7 @@ export function HomePage() {
   const [categoriesLoading, setCategoriesLoading] = useState(true)
   const [isCategoryLoading, setIsCategoryLoading] = useState(false)
 
-  // Get unique categories
+  // Get filtered products
   const filteredProducts = activeCategory === 'all' 
     ? products 
     : products.filter(product => product.category?.slug === activeCategory)
@@ -29,7 +27,7 @@ export function HomePage() {
   const fetchProducts = useCallback(async (isLoadingMore = false) => {
     try {
       if (!isLoadingMore) {
-        setLoadingState(prev => ({ ...prev, isLoading: true }))
+        setLoadingState((prev: LoadingState) => ({ ...prev, isLoading: true }))
       }
 
       const from = (page - 1) * PAGE_SIZE
@@ -60,19 +58,19 @@ export function HomePage() {
       
       if (data) {
         setProducts(prev => isLoadingMore ? [...prev, ...data] : data)
-        setLoadingState(prev => ({ 
+        setLoadingState((prev: LoadingState) => ({ 
           ...prev, 
           hasMore: count ? from + data.length < count : false
         }))
       }
     } catch (err) {
-      setLoadingState(prev => ({
+      setLoadingState((prev: LoadingState) => ({
         ...prev,
         error: err instanceof Error ? err.message : 'An error occurred'
       }))
       console.error('Error fetching products:', err)
     } finally {
-      setLoadingState(prev => ({ ...prev, isLoading: false }))
+      setLoadingState((prev: LoadingState) => ({ ...prev, isLoading: false }))
     }
   }, [page, sortBy, activeCategory])
 

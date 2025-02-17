@@ -18,20 +18,22 @@ export interface Product {
   category?: Category
 }
 
-export type NewProduct = Omit<Product, 'id' | 'created_at' | 'votes' | 'category'>
-
-// Add pagination types
-export interface PaginationState {
-  page: number
-  pageSize: number
-  total: number
-}
-
-// Add sort options type
 export type SortOption = 'votes' | 'newest'
 
 export interface LoadingState {
   isLoading: boolean
   hasMore: boolean
   error: string | null
+}
+
+// Types for form state
+export type NewProduct = Omit<Product, 'id' | 'created_at' | 'votes' | 'category'> & {
+  category_id: number
+}
+
+// Add pagination types
+export interface PaginationState {
+  page: number
+  pageSize: number
+  total: number
 } 

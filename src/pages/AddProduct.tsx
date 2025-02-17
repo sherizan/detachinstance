@@ -1,28 +1,48 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import type { NewProduct } from '../types'
+import type { Product, Category } from '../types'
 
 export function AddProduct() {
   const navigate = useNavigate()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [newProduct, setNewProduct] = useState<NewProduct>({
+  const [categories, setCategories] = useState<Category[]>([])
+  const [newProduct, setNewProduct] = useState<Omit<Product, 'id' | 'created_at' | 'votes' | 'category'>>({
     name: '',
     url: '',
     description: '',
     logo_url: '',
     video_url: '',
-    category: ''
+    category_id: 0
   })
 
-  const handleAddProduct = async (e: React.FormEvent) => {
+  // Fetch categories on mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('categories')
+          .select('*')
+          .order('name')
+
+        if (error) throw error
+        if (data) setCategories(data)
+      } catch (err) {
+        console.error('Error fetching categories:', err)
+      }
+    }
+
+    fetchCategories()
+  }, [])
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsSubmitting(true)
     setError(null)
     
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('products')
         .insert([
           {
@@ -35,9 +55,9 @@ export function AddProduct() {
 
       if (error) throw error
       
-      // Successfully added product
       navigate('/')
     } catch (err) {
+      console.error('Error adding product:', err)
       setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
       setIsSubmitting(false)
@@ -65,7 +85,7 @@ export function AddProduct() {
           </div>
         )}
 
-        <form onSubmit={handleAddProduct} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Product Name
@@ -142,16 +162,16 @@ export function AddProduct() {
             </label>
             <select
               required
-              value={newProduct.category}
-              onChange={(e) => setNewProduct({...newProduct, category: e.target.value})}
+              value={newProduct.category_id || ''}
+              onChange={(e) => setNewProduct({...newProduct, category_id: Number(e.target.value)})}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
               <option value="">Select a category</option>
-              <option value="UI Design & Prototyping">UI Design & Prototyping</option>
-              <option value="Design to Code">Design to Code</option>
-              <option value="Visual Content Creation">Visual Content Creation</option>
-              <option value="UX Writing">UX Writing</option>
-              <option value="AI Design Generation">AI Design Generation</option>
+              {categories.map(category => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
             </select>
           </div>
 
